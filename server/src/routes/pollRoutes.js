@@ -264,13 +264,173 @@
 
 // export default router;
 
+// router.get('/polls/last-completed', (req, res) => {
+//   try {
+//     res.json({
+//       success: true,
+//       poll: memoryStore.lastCompletedPoll
+//     });
+//   } catch (e) {
+//     res.status(500).json({ success: false, error: e.message });
+//   }
+// });
+
+import express from 'express';
+import memoryStore from '../store/memoryStore.js';
+
+const router = express.Router();
+
+/**
+ * GET /api/polls/active
+ */
+router.get('/polls/active', (req, res) => {
+  try {
+    const activePoll = memoryStore.getActivePoll();
+    res.json({
+      success: true,
+      poll: activePoll && activePoll.status === 'active' ? activePoll : null,
+      timer: memoryStore.getTimer()
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * GET /api/polls/past
+ */
+router.get('/polls/past', (req, res) => {
+  try {
+    res.json({
+      success: true,
+      polls: memoryStore.getPastPolls()
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * GET /api/polls/last-completed
+ */
 router.get('/polls/last-completed', (req, res) => {
   try {
     res.json({
       success: true,
       poll: memoryStore.lastCompletedPoll
     });
-  } catch (e) {
-    res.status(500).json({ success: false, error: e.message });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
   }
 });
+
+/**
+ * POST /api/polls
+ */
+router.post('/polls', (req, res) => {
+  try {
+    const { question, options, timer, correctAnswer, baseMark } = req.body;
+
+    if (!question || !Array.isArray(options) || options.length < 2) {
+      return res.status(400).json({
+        success: false,
+        error: 'Question and at least 2 options are required'
+      });
+    }
+
+    const activePoll = memoryStore.getActivePoll();
+    if (activePoll && activePoll.status === 'active') {
+      return res.status(400).json({
+        success: false,
+        error: 'A poll is already active'
+      });
+    }
+
+    const poll = memoryStore.createPoll({
+      question,
+      options,
+      timer: timer || 60,
+      correctAnswer,
+      baseMark
+    });
+
+    res.json({ success: true, poll });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * PUT /api/polls/timer
+ */
+router.put('/polls/timer', (req, res) => {
+  try {
+    const { timer } = req.body;
+    const updated = memoryStore.updatePollTimer(timer);
+    if (!updated) {
+      return res.status(400).json({
+        success: false,
+        error: 'Cannot update timer'
+      });
+    }
+    res.json({
+      success: true,
+      poll: memoryStore.getActivePoll()
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * GET /api/students
+ */
+router.get('/students', (req, res) => {
+  try {
+    res.json({
+      success: true,
+      students: memoryStore.getAllStudents()
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * DELETE /api/students/:socketId
+ */
+router.delete('/students/:socketId', (req, res) => {
+  try {
+    const student = memoryStore.removeStudent(req.params.socketId);
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        error: 'Student not found'
+      });
+    }
+    res.json({ success: true, student });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * GET /api/polls/:pollId/analytics
+ */
+router.get('/polls/:pollId/analytics', (req, res) => {
+  try {
+    const analytics = memoryStore.getPollAnalytics(req.params.pollId);
+    if (!analytics) {
+      return res.status(404).json({
+        success: false,
+        error: 'Poll not found'
+      });
+    }
+    res.json({ success: true, analytics });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+export default router;
+
