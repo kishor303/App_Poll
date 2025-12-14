@@ -1,0 +1,117 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply m-0 p-0 box-border;
+  }
+
+  body {
+    @apply font-sans bg-slate-50 text-slate-900 leading-relaxed antialiased;
+  }
+
+  #root {
+    @apply min-h-screen;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-xl p-6 shadow-md transition-shadow duration-200;
+  }
+
+  .card:hover {
+    @apply shadow-lg;
+  }
+
+  .btn {
+    @apply px-6 py-2 border-none rounded-xl font-sans text-base font-medium cursor-pointer transition-all duration-200 inline-flex items-center justify-center gap-2;
+  }
+
+  .btn:disabled {
+    @apply opacity-60 cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-white;
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    @apply bg-primary-dark -translate-y-0.5 shadow-md;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-white;
+  }
+
+  .btn-secondary:hover:not(:disabled) {
+    @apply bg-secondary-dark -translate-y-0.5;
+  }
+
+  .btn-danger {
+    @apply bg-danger text-white;
+  }
+
+  .btn-danger:hover:not(:disabled) {
+    @apply bg-danger-dark -translate-y-0.5;
+  }
+
+  .btn-outline {
+    @apply bg-transparent border-2 border-primary text-primary;
+  }
+
+  .btn-outline:hover:not(:disabled) {
+    @apply bg-primary text-white;
+  }
+
+  .input {
+    @apply w-full px-4 py-2 border-2 border-slate-200 rounded-xl font-sans text-base transition-colors duration-200;
+  }
+
+  .input:focus {
+    @apply outline-none border-primary;
+  }
+
+  .input:disabled {
+    @apply bg-slate-100 cursor-not-allowed;
+  }
+
+  .spinner {
+    @apply border-4 border-slate-200 border-t-primary rounded-full w-10 h-10 animate-spin mx-auto my-8;
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+
